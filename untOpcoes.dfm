@@ -1,6 +1,6 @@
 object frmOpcoes: TfrmOpcoes
-  Left = 367
-  Top = 320
+  Left = 261
+  Top = 360
   BorderIcons = [biSystemMenu]
   BorderStyle = bsSingle
   Caption = 'Op'#231#245'es Nota Fiscal V.6'
