@@ -1,6 +1,6 @@
 object frmGeraNota: TfrmGeraNota
-  Left = 411
-  Top = 298
+  Left = 222
+  Top = 256
   Width = 692
   Height = 407
   BorderIcons = [biSystemMenu]

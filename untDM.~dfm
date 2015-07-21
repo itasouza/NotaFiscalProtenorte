@@ -1,8 +1,8 @@
 object DM: TDM
   OldCreateOrder = False
   OnCreate = DataModuleCreate
-  Left = 907
-  Top = 430
+  Left = 568
+  Top = 202
   Height = 383
   Width = 363
   object ACBrNFe1: TACBrNFe

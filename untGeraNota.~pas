@@ -1190,7 +1190,7 @@ begin
 
                if DM.cdsConsultaPedido.FieldByName('freteporconta').AsString = 'CIF' then
                // Modalidade do Frete ( CIF ou FOB )
-                  Transp.modFrete   :=  mfContaEmitente
+                  Transp.modFrete   := mfContaEmitente
                 else
                   Transp.modFrete   := mfContaDestinatario;
 
