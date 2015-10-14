@@ -107,7 +107,7 @@ var
   TextoSemCaracteres: string;
 begin
   for i := Length(texto) downto 1 do
-     if not (texto[i] in ['.','-','/','"','''']) then
+     if not (texto[i] in [',',':','.','-','/','"','''']) then
         TextoSemCaracteres := texto[i] + TextoSemCaracteres;
   Result := TextoSemCaracteres;
 end;
@@ -205,7 +205,6 @@ procedure TfrmGeraNota.btnGerarFNeClick(Sender: TObject);
 
 begin
 
-
   if ControlePedido = 0 then
    begin
       MessageDlg('É necessário selecionar o pedido', mtWarning, [mbOK],0);
@@ -236,9 +235,6 @@ begin
          DM.ACBrNFe1.Configuracoes.Certificados.SelecionarCertificado;
     end;
     }
-
-
-
 
 
    DM.ACBrNFe1.NotasFiscais.Clear;
@@ -276,35 +272,37 @@ begin
 
 
         //verifica na tabela de tb_tipo_movimento se é uma nota de entrada ou saida
-      if (DM.cdsConsultaPedido.FieldByName('tipoentadasaida').AsString = 'S' ) then
-        Ide.tpNF                := tnSaida  //indica se é uma nota de entrada ou saida
-      else
-        Ide.tpNF                := tnEntrada;  //indica se é uma nota de entrada ou saida
+
+        if (DM.cdsConsultaPedido.FieldByName('tipoentadasaida').AsString = 'S' ) then
+           Ide.tpNF  := tnSaida                                // indica se é uma nota de entrada ou saida
+         else
+          Ide.tpNF   := tnEntrada;                             // indica se é uma nota de entrada ou saida
 
 
        if DM.sAmbiente = 0 then
-          Ide.tpAmb             := taProducao    // verifica se esta em modo de produção ou homologação
+          Ide.tpAmb  := taProducao                             // verifica se esta em modo de produção ou homologação
        else
-          Ide.tpAmb             := taHomologacao;
+          Ide.tpAmb  := taHomologacao;
 
-        Ide.verProc             := '3.10.49'; // versão do aplicativo
-        Ide.cUF                 := StrToInt(PegaNumeroEstado(DM.sUF));   //uf do emitente
-        Ide.cMunFG              := StrToInt(DM.sCodMun); // código do munícipio
+        Ide.verProc  := '3.10.61';                             // versão do aplicativo
+        Ide.cUF      := StrToInt(PegaNumeroEstado(DM.sUF));    // uf do emitente
+        Ide.cMunFG   := StrToInt(DM.sCodMun);                  // código do munícipio
 
         //verifica se é uma nota de fnalizade para normal ou devolução etc
-        Ide.finNFe              := fnNormal; //situação da finalidade (normal. complementar, ajuste, devolução)
+
+        Ide.finNFe   := fnNormal;                             // situação da finalidade (normal. complementar, ajuste, devolução)
 
 
        //emitente vem da tela de configuração ******************************************************************
 
        if DM.sRegime = 0 then
-            Emit.CRT              := crtSimplesNacional //   crt - código de regime tributário
+          Emit.CRT              := crtSimplesNacional //   crt - código de regime tributário
        else
          if DM.sRegime = 1 then
-            Emit.CRT              := crtRegimeNormal
+            Emit.CRT            := crtRegimeNormal
        else
          if DM.sRegime = 2 then
-            Emit.CRT              := crtSimplesExcessoReceita;
+            Emit.CRT            := crtSimplesExcessoReceita;
 
         Emit.CNPJCPF            := DM.sCNPJ;  //cnpj da empresa
         Emit.IE                 := DM.sIE;    // ie da empresa
@@ -346,16 +344,18 @@ begin
 
 
         // Entrega *********************************************************************************************
-        Entrega.xLgr    := DM.cdsConsultaPedido.FieldByName('enderecoentrega').AsString; // enderreço da entrega
-        Entrega.nro     := DM.cdsConsultaPedido.FieldByName('numeroentrega').AsString;    // número da entrega
-        Entrega.xCpl    := DM.cdsConsultaPedido.FieldByName('complementoentrega').AsString; // complemento do endereço
-        Entrega.xBairro := DM.cdsConsultaPedido.FieldByName('bairroentrega').AsString;      // bairro da entrega
-        Entrega.cMun    := DM.cdsConsultaPedido.FieldByName('codigoibgeentrega').AsInteger;  // código ibge entrega
-        Entrega.xMun    := DM.cdsConsultaPedido.FieldByName('cidadeentrega').AsString;   // cidade de entrega
-        Entrega.UF      := DM.cdsConsultaPedido.FieldByName('estadoentrega').AsString;   // Uf do estado
+        
+//       Entrega.xLgr    := DM.cdsConsultaPedido.FieldByName('enderecoentrega').AsString; // enderreço da entrega
+//       Entrega.nro     := DM.cdsConsultaPedido.FieldByName('numeroentrega').AsString;    // número da entrega
+//       Entrega.xCpl    := DM.cdsConsultaPedido.FieldByName('complementoentrega').AsString; // complemento do endereço
+//       Entrega.xBairro := DM.cdsConsultaPedido.FieldByName('bairroentrega').AsString;      // bairro da entrega
+//       Entrega.cMun    := DM.cdsConsultaPedido.FieldByName('codigoibgeentrega').AsInteger;  // código ibge entrega
+//       Entrega.xMun    := DM.cdsConsultaPedido.FieldByName('cidadeentrega').AsString;   // cidade de entrega
+//       Entrega.UF      := DM.cdsConsultaPedido.FieldByName('estadoentrega').AsString;   // Uf do estado
 
+// Vinicius comentou, pois não temos estes campos na tabela
 
-              //busca os itens da nota  *******************************************************************************
+           //busca os itens da nota  *******************************************************************************
            DM.cdsDetalheVenda.Close;
            DM.cdsDetalheVenda.CommandText := '';
 
@@ -388,26 +388,26 @@ begin
                 // (H)
                 Prod.nItem  := aNumIten;
 
-                Prod.cProd    := DM.cdsDetalheVenda.FieldByName('codigocomercial').AsString;               // controle comercial do produto
-                Prod.cEAN     := DM.cdsDetalheVenda.FieldByName('codigobarras').AsString;                             // código barras do produto
-                Prod.xProd    := DM.cdsDetalheVenda.FieldByName('NomeProduto').AsString;                        // descrição do produto
-                Prod.NCM      := DM.cdsDetalheVenda.FieldByName('codigoncm').AsString;                               // ncm do produto
-                Prod.CFOP     := DM.cdsDetalheVenda.FieldByName('cfop').AsString;  //naturaza de operação
-                Prod.uCom     := DM.cdsDetalheVenda.FieldByName('descricaounidade').AsString;     // unidade do produto
-                Prod.qCom     := DM.cdsDetalheVenda.FieldByName('quantidade').Value;   // quantidade comercial produto enviado  C
-                Prod.vUnCom   := DM.cdsDetalheVenda.FieldByName('valorunitarioproduto').AsFloat;  //valor unitário do produto
-                Prod.vProd    := DM.cdsDetalheVenda.FieldByName('valortotalproduto').AsFloat;    //valor total do produto
+                Prod.cProd    := DM.cdsDetalheVenda.FieldByName('codigocomercial').AsString;     // controle comercial do produto
+                Prod.cEAN     := DM.cdsDetalheVenda.FieldByName('codigobarras').AsString;        // código barras do produto
+                Prod.xProd    := DM.cdsDetalheVenda.FieldByName('NomeProduto').AsString;         // descrição do produto
+                Prod.NCM      := DM.cdsDetalheVenda.FieldByName('codigoncm').AsString;           // ncm do produto
+                Prod.CFOP     := DM.cdsDetalheVenda.FieldByName('cfop').AsString;                // naturaza de operação
+                Prod.uCom     := DM.cdsDetalheVenda.FieldByName('descricaounidade').AsString;    // unidade do produto
+                Prod.qCom     := DM.cdsDetalheVenda.FieldByName('quantidade').Value;             // quantidade comercial produto enviado  C
+                Prod.vUnCom   := DM.cdsDetalheVenda.FieldByName('valorunitarioproduto').AsFloat; // valor unitário do produto
+                Prod.vProd    := DM.cdsDetalheVenda.FieldByName('valortotalproduto').AsFloat;    // valor total do produto
                 Prod.cEANTrib := '';
-                Prod.uTrib    := DM.cdsDetalheVenda.FieldByName('descricaounidade').AsString;     // unidade do produto
-                Prod.qTrib    := DM.cdsDetalheVenda.FieldByName('quantidade').Value;    // quantidade tributada produto enviado  C
-                Prod.vUnTrib  := DM.cdsDetalheVenda.FieldByName('valorunitarioproduto').AsFloat;  //valor unitário do produto
+                Prod.uTrib    := DM.cdsDetalheVenda.FieldByName('descricaounidade').AsString;    // unidade do produto
+                Prod.qTrib    := DM.cdsDetalheVenda.FieldByName('quantidade').Value;             // quantidade tributada produto enviado  C
+                Prod.vUnTrib  := DM.cdsDetalheVenda.FieldByName('valorunitarioproduto').AsFloat; // valor unitário do produto
                 //Prod.IndTot   := '1';
                 Prod.qTrib    := DM.cdsDetalheVenda.FieldByName('quantidade').Value;
 
                if aNumIten = 1 then
                 begin
-                  Prod.vFrete   := DM.cdsDetalheVenda.FieldByName('valorfrete').Value;
-                  Prod.vDesc    := DM.cdsDetalheVenda.FieldByName('valordesconto').AsFloat;  //(verificar o desconto estar por intem)
+                  Prod.vFrete   := DM.cdsDetalheVenda.FieldByName('valorfrete').Value;          // Valor do Frete
+                  Prod.vDesc    := DM.cdsDetalheVenda.FieldByName('valordesconto').AsFloat;     //(verificar o desconto estar por intem)
                 end;
 
                // Prod.vFrete   := DM.cdsDetalheVenda.FieldByName('valorfrete').Value;
@@ -421,11 +421,11 @@ begin
                 //consulta o ncm da tabela IBPT
                 DM.cdsConsultaIBPT.Close;
                 DM.cdsConsultaIBPT.CommandText := '';
-                DM.cdsConsultaIBPT.CommandText := 'select * from TB_TABELAIBPT where codigo =' + QuotedStr(Prod.NCM) ;
+                DM.cdsConsultaIBPT.CommandText := 'select * from TB_TABELAIBPT_novo where codigo =' + QuotedStr(Prod.NCM) ;
                 DM.cdsConsultaIBPT.Open;
 
                 //valor total do item
-                ValorTotalImposto := ValorTotalImposto + ( (Prod.vProd / 100) * DM.cdsConsultaIBPT.FieldByName('ALIQNAC').AsFloat);
+                ValorTotalImposto := ValorTotalImposto + ( (Prod.vProd ) * DM.cdsConsultaIBPT.FieldByName('ALIQNAC').AsFloat);
 
                 //..........................................................................................
                 //nova alteração 11/06/2013
@@ -441,7 +441,7 @@ begin
 
                       if DM.cdsDetalheVenda.FieldByName('cst').AsString = '000' then // 0 - Tributado    (revisar)
                       begin
-                        vTotTrib      := (Prod.vProd / 100) * DM.cdsConsultaIBPT.FieldByName('ALIQNAC').AsFloat ;
+                        vTotTrib      := (Prod.vProd) * DM.cdsConsultaIBPT.FieldByName('ALIQNAC').AsFloat ;
                         CSOSN         := csosn101; // {verificar }
                         ICMS.orig     := oeNacional;
                         ICMS.modBC    := dbiValorOperacao;
@@ -487,7 +487,7 @@ begin
 
                      if DM.cdsDetalheVenda.FieldByName('cst').AsString = '040' then //
                       begin
-                        vTotTrib      := (Prod.vProd / 100) * DM.cdsConsultaIBPT.FieldByName('ALIQNAC').AsFloat ;
+                        vTotTrib      := (Prod.vProd) * DM.cdsConsultaIBPT.FieldByName('ALIQNAC').AsFloat ;
                         CSOSN         := csosn101; // {verificar }
                         ICMS.orig     := oeNacional;
                         ICMS.modBC    := dbiValorOperacao;
@@ -534,7 +534,7 @@ begin
 
                       if DM.cdsDetalheVenda.FieldByName('cst').AsString = '060' then // 3 - Sub. Tributaria   (revisar)
                       begin
-                          vTotTrib      := (Prod.vProd / 100) * DM.cdsConsultaIBPT.FieldByName('ALIQNAC').AsFloat ;
+                          vTotTrib      := (Prod.vProd) * DM.cdsConsultaIBPT.FieldByName('ALIQNAC').AsFloat ;
                           CSOSN         := csosn101; // {verificar }
                           ICMS.orig     := oeNacional;
                           ICMS.modBC    := dbiValorOperacao;
@@ -577,9 +577,9 @@ begin
 
                       end;
 
-                      if DM.cdsDetalheVenda.FieldByName('cst').AsString = '200' then // 4 - importador
+                      if DM.cdsDetalheVenda.FieldByName('cst').AsString = '200' then // 4 - importado adquirido no mercado interno
                       begin
-                          vTotTrib      := (Prod.vProd / 100) * DM.cdsConsultaIBPT.FieldByName('ALIQNAC').AsFloat ;
+                          vTotTrib      := (Prod.vProd ) * DM.cdsConsultaIBPT.FieldByName('ALIQIMP').AsFloat ;
                           CSOSN         := csosn101; // {verificar }
                           ICMS.orig     := oeEstrangeiraAdquiridaBrasil;
                           ICMS.modBC    := dbiValorOperacao;
@@ -623,9 +623,9 @@ begin
                       end;
 
 
-                       if DM.cdsDetalheVenda.FieldByName('cst').AsString = '240' then // 4 - importador
+                       if DM.cdsDetalheVenda.FieldByName('cst').AsString = '240' then // 4 - importado
                       begin
-                          vTotTrib      := (Prod.vProd / 100) * DM.cdsConsultaIBPT.FieldByName('ALIQNAC').AsFloat ;
+                          vTotTrib      := (Prod.vProd ) * DM.cdsConsultaIBPT.FieldByName('ALIQIMP').AsFloat ;
                           CSOSN         := csosn101; // {verificar }
                           ICMS.orig     := oeEstrangeiraAdquiridaBrasil;
                           ICMS.modBC    := dbiValorOperacao;
@@ -671,7 +671,7 @@ begin
 
                     if DM.cdsDetalheVenda.FieldByName('cst').AsString = '260' then // 3 - importado com sub. tribut.  (revisar)
                       begin
-                          vTotTrib      := (Prod.vProd / 100) * DM.cdsConsultaIBPT.FieldByName('ALIQNAC').AsFloat ;
+                          vTotTrib      := (Prod.vProd) * DM.cdsConsultaIBPT.FieldByName('ALIQIMP').AsFloat ;
                           CSOSN         := csosn101; // {verificar }
                           ICMS.orig     := oeEstrangeiraAdquiridaBrasil;
                           ICMS.modBC    := dbiValorOperacao;
@@ -713,9 +713,9 @@ begin
                           ValorTotalCofins := ValorTotalCofins + DM.cdsDetalheVenda.FieldByName('valorcofins').AsFloat;
                       end;
 
-                      if DM.cdsDetalheVenda.FieldByName('cst').AsString = '300' then // 3 - importado com sub. tribut.  (revisar)
+                      if DM.cdsDetalheVenda.FieldByName('cst').AsString = '300' then // 3 - importado
                       begin
-                          vTotTrib      := (Prod.vProd / 100) * DM.cdsConsultaIBPT.FieldByName('ALIQNAC').AsFloat ;
+                          vTotTrib      := (Prod.vProd) * DM.cdsConsultaIBPT.FieldByName('ALIQIMP').AsFloat ;
                           CSOSN         := csosn101; // {verificar }
                           ICMS.orig     := oeNacionalConteudoImportacaoSuperior40;
                           ICMS.modBC    := dbiValorOperacao;
@@ -759,7 +759,7 @@ begin
 
                     if DM.cdsDetalheVenda.FieldByName('cst').AsString = '340' then // 3 - importado com sub. tribut.  (revisar)
                       begin
-                          vTotTrib      := (Prod.vProd / 100) * DM.cdsConsultaIBPT.FieldByName('ALIQNAC').AsFloat ;
+                          vTotTrib      := (Prod.vProd) * DM.cdsConsultaIBPT.FieldByName('ALIQIMP').AsFloat ;
                           CSOSN         := csosn101; // {verificar }
                           ICMS.orig     := oeNacionalConteudoImportacaoSuperior40;
                           ICMS.modBC    := dbiValorOperacao;
@@ -804,7 +804,7 @@ begin
 
                        if DM.cdsDetalheVenda.FieldByName('cst').AsString = '360' then // 3 - importado com sub. tribut.  (revisar)
                       begin
-                          vTotTrib      := (Prod.vProd / 100) * DM.cdsConsultaIBPT.FieldByName('ALIQNAC').AsFloat ;
+                          vTotTrib      := (Prod.vProd) * DM.cdsConsultaIBPT.FieldByName('ALIQIMP').AsFloat ;
                           CSOSN         := csosn101; // {verificar }
                           ICMS.orig     := oeNacionalConteudoImportacaoSuperior40;
                           ICMS.modBC    := dbiValorOperacao;
@@ -849,7 +849,7 @@ begin
 
                      if DM.cdsDetalheVenda.FieldByName('cst').AsString = '400' then // 3 - importado com sub. tribut.  (revisar)
                       begin
-                          vTotTrib      := (Prod.vProd / 100) * DM.cdsConsultaIBPT.FieldByName('ALIQNAC').AsFloat ;
+                          vTotTrib      := (Prod.vProd) * DM.cdsConsultaIBPT.FieldByName('ALIQIMP').AsFloat ;
                           CSOSN         := csosn101; // {verificar }
                           ICMS.orig     := oeNacionalConteudoImportacaoSuperior40;
                           ICMS.modBC    := dbiValorOperacao;
@@ -894,7 +894,7 @@ begin
 
                       if DM.cdsDetalheVenda.FieldByName('cst').AsString = '440' then // 3 - importado com sub. tribut.  (revisar)
                       begin
-                          vTotTrib      := (Prod.vProd / 100) * DM.cdsConsultaIBPT.FieldByName('ALIQNAC').AsFloat ;
+                          vTotTrib      := (Prod.vProd ) * DM.cdsConsultaIBPT.FieldByName('ALIQIMP').AsFloat ;
                           CSOSN         := csosn101; // {verificar }
                           ICMS.orig     := oeNacionalConteudoImportacaoSuperior40;
                           ICMS.modBC    := dbiValorOperacao;
@@ -939,7 +939,7 @@ begin
 
                        if DM.cdsDetalheVenda.FieldByName('cst').AsString = '460' then // 3 - importado com sub. tribut.  (revisar)
                       begin
-                          vTotTrib      := (Prod.vProd / 100) * DM.cdsConsultaIBPT.FieldByName('ALIQNAC').AsFloat ;
+                          vTotTrib      := (Prod.vProd) * DM.cdsConsultaIBPT.FieldByName('ALIQIMP').AsFloat ;
                           CSOSN         := csosn101; // {verificar }
                           ICMS.orig     := oeNacionalConteudoImportacaoSuperior40;
                           ICMS.modBC    := dbiValorOperacao;
@@ -983,7 +983,7 @@ begin
 
                     if DM.cdsDetalheVenda.FieldByName('cst').AsString = '500' then // 3 - importado com sub. tribut.  (revisar)
                       begin
-                          vTotTrib      := (Prod.vProd / 100) * DM.cdsConsultaIBPT.FieldByName('ALIQNAC').AsFloat ;
+                          vTotTrib      := (Prod.vProd ) * DM.cdsConsultaIBPT.FieldByName('ALIQIMP').AsFloat ;
                           CSOSN         := csosn101; // {verificar }
                           ICMS.orig     := oeNacionalConteudoImportacaoInferiorIgual40;
                           ICMS.modBC    := dbiValorOperacao;
@@ -1027,7 +1027,7 @@ begin
 
                  if DM.cdsDetalheVenda.FieldByName('cst').AsString = '540' then // 3 - importado com sub. tribut.  (revisar)
                       begin
-                          vTotTrib      := (Prod.vProd / 100) * DM.cdsConsultaIBPT.FieldByName('ALIQNAC').AsFloat ;
+                          vTotTrib      := (Prod.vProd) * DM.cdsConsultaIBPT.FieldByName('ALIQIMP').AsFloat ;
                           CSOSN         := csosn101; // {verificar }
                           ICMS.orig     := oeNacionalConteudoImportacaoInferiorIgual40;
                           ICMS.modBC    := dbiValorOperacao;
@@ -1072,7 +1072,7 @@ begin
 
                     if DM.cdsDetalheVenda.FieldByName('cst').AsString = '560' then // 3 - importado com sub. tribut.  (revisar)
                       begin
-                          vTotTrib      := (Prod.vProd / 100) * DM.cdsConsultaIBPT.FieldByName('ALIQNAC').AsFloat ;
+                          vTotTrib      := (Prod.vProd ) * DM.cdsConsultaIBPT.FieldByName('ALIQIMP').AsFloat ;
                           CSOSN         := csosn101; // {verificar }
                           ICMS.orig     := oeNacionalConteudoImportacaoInferiorIgual40;
                           ICMS.modBC    := dbiValorOperacao;
@@ -1160,7 +1160,7 @@ begin
           Total.ICMSTot.vCOFINS  :=  ValorTotalCofins;  // valor total Cofins
           Total.ICMSTot.vOutro   :=  0;
           Total.ICMSTot.vTotTrib :=  ValorTotalImposto;
-          Total.ICMSTot.vNF      :=  DM.cdsDetalheVenda.FieldByName('totalnotaprodutos').AsFloat; // valor total da nota
+          Total.ICMSTot.vNF      :=  DM.cdsDetalheVenda.FieldByName('totalnotaprodutos').AsFloat - DM.cdsDetalheVenda.FieldByName('valordesconto').AsFloat; // valor total da nota
 
 
           //dados de serviços  ******************************************************************************
@@ -1220,8 +1220,8 @@ begin
                 esp   := DM.cdsConsultaPedido.FieldByName('especie').AsString;  //especie
                 marca := '';//editMarca.Text; // marca
                 nVol  := DM.cdsConsultaPedido.FieldByName('volume').AsString; //número de volumes
-                pesoL := StrToIntDef(DM.cdsConsultaPedido.FieldByName('peso').AsString,0); //peso liquido
-                pesoB := StrToIntDef(DM.cdsConsultaPedido.FieldByName('peso').AsString,0); // peso bruto
+                pesoL := StrToFloatDef(DM.cdsConsultaPedido.FieldByName('peso').AsString,0); //peso liquido
+                pesoB := StrToFloatDef(DM.cdsConsultaPedido.FieldByName('peso').AsString,0); // peso bruto
             end;
 
 
@@ -1230,38 +1230,39 @@ begin
            Cobr.Fat.nFat  :=   DM.cdsDetalheVenda.FieldByName('controlepedido').AsString;   // número do pedido
            Cobr.Fat.vOrig :=   DM.cdsDetalheVenda.FieldByName('totalnotaprodutos').AsFloat;   // valor total
            Cobr.Fat.vDesc :=   DM.cdsDetalheVenda.FieldByName('valordesconto').AsFloat;  // valor desconto
-           Cobr.Fat.vLiq  :=   DM.cdsDetalheVenda.FieldByName('totalnotaprodutos').AsFloat;  // valor liquido desconto
+           Cobr.Fat.vLiq  :=   DM.cdsDetalheVenda.FieldByName('totalnotaprodutos').AsFloat - DM.cdsDetalheVenda.FieldByName('valordesconto').AsFloat;  // valor liquido desconto
 
 
-           //informações da cobrança*********************************************************************************
+        // informações da cobrança   *********************************************************************************
+
            DM.cdsFinanceiro.Close;
            DM.cdsFinanceiro.CommandText := '';
            DM.cdsFinanceiro.CommandText :=
-            'select a.numerodocumento, b.controletipomovimento, * from TB_RECEBIMENTO a            '+
-            'inner join  tb_c_vendas b on b.controle = a.controlevenda                             '+
-            'inner join  TB_TIPO_MOVIMENTO c on c.controletipomovimento  = b.controletipomovimento '+
-            'where c.tipoentadasaida = ''S''                                                       '+
-            'and b.controle = '+ QuotedStr(IntToStr(ControlePedido));
-            DM.cdsFinanceiro.Open;
+           'select a.numerodocumento, b.controletipomovimento, * from TB_RECEBIMENTO a            '+
+           'inner join  tb_c_vendas b on b.controle = a.controlevenda                             '+
+           'inner join  TB_TIPO_MOVIMENTO c on c.controletipomovimento  = b.controletipomovimento '+
+           'where c.tipoentadasaida = ''S''                                                       '+
+           'and b.controle = '+ QuotedStr(IntToStr(ControlePedido));
+           DM.cdsFinanceiro.Open;
 
-          DM.cdsFinanceiro.First;
-         while not DM.cdsFinanceiro.Eof do
-          begin
+           DM.cdsFinanceiro.First;
+            while not DM.cdsFinanceiro.Eof do
+              begin
 
                with Cobr.Dup.Add do
                 begin
-                   nDup   := DM.cdsFinanceiro.FieldByName('descricao').AsString; // número da duplicata
-                   dVenc  := DM.cdsFinanceiro.FieldByName('datavencimento').AsDateTime; // data de vencimento
-                   vDup   := DM.cdsFinanceiro.FieldByName('valorreal').AsFloat; // valor da duplicata
+                   nDup   := DM.cdsFinanceiro.FieldByName('descricao').AsString;         // número da duplicata
+                   dVenc  := DM.cdsFinanceiro.FieldByName('datavencimento').AsDateTime;  // data de vencimento
+                   vDup   := DM.cdsFinanceiro.FieldByName('valorreal').AsFloat;          // valor da duplicata
                 end;
 
              DM.cdsFinanceiro.Next;
           end;
-           ObservacaoNota := DM.cdsConsultaPedido.FieldByName('ObsCliente').AsString +  DM.cdsConsultaPedido.FieldByName('observacao').AsString + '|' ;
+           ObservacaoNota := LimparCaracteres(DM.cdsConsultaPedido.FieldByName('ObsCliente').AsString) +  LimparCaracteres(DM.cdsConsultaPedido.FieldByName('observacao').AsString) ;
 
            //informações adicionais contabilidade e Fisco ************************************************************
            InfAdic.infAdFisco := '';
-           InfAdic.infCpl     :=  ObservacaoNota; //observação
+           InfAdic.infCpl     :=  ObservacaoNota;  // observação
           {
            with InfAdic.obsCont.Add do
             begin
